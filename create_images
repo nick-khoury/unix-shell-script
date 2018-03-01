@@ -1,0 +1,105 @@
+#!/bin/csh
+
+# to run this script type in command line: create_images input_dir output_dir 'pattern_1' 'pattern_2' ... 'pattern_n'
+#                                                                              pattern_n can be gif, png, etc.
+
+# begin search in root folder continue to sub folders
+
+
+# void check-folder-for-pattern-n(folder-location) 
+    # while folder != empty:
+
+        # inspect first element
+        # if it is a file
+        # then check if it contains any of the given patterns
+        
+            # if file extension == gif OR png OR tiff OR etc
+            # then convert it to a jpeg and put it in the output_folder
+
+        # else if it is a file make a recursive call on the file
+        
+        # else skip the file or directory and print an error message to the display
+
+# make an html file with links to each jpeg in the out_folder
+
+
+
+if ($#argv < 3) then
+    echo Wrong number of arguments
+else if ( ! -d /$argv[1] ) then 
+    echo Non-existent input directory
+else if ( ! -r /$argv[1] ) then 
+    echo Unreadable input directory
+else
+    echo Script is beginning
+    
+    
+    set input_dir = $argv[1]
+    shift
+    
+    set output_dir = $argv[1]
+    shift
+ 
+    cd $output_dir
+    if ( ! -d /$output_dir/thumbs ) then
+        echo creating thumbnail directory
+        mkdir "thumbs"
+    else
+        echo thumbnail directory already exists
+    
+        #chech for unusable files and print error messages
+        
+        
+        
+        #begin conversion
+        echo "" > pic_name_xx.html
+        echo "<html><head><title>Test Images</title></head><body>" >> pic_name_xx.html
+        
+       
+        while ($#argv > 0) # loop runs once per given pattern
+        
+            set mypic = `find $input_dir -name "*$argv[1]"` #gets files matching one of the patterns given
+            echo picture list now is $mypic
+            basename $mypic[1]
+            
+            set mydir = `dirname $mypic[1]` #get directory of first picture
+            
+            echo pic directory is $mydir
+          
+            cd $mydir
+            pwd
+            
+            set basen = `basename $mypic[1]`
+            set picname = $basen:t:r
+            set picname = `echo $picname | tr "[:lower:]" "[:upper:]"`
+            echo $picname
+            echo ${picname}.jpg
+            
+            convert $basen ${picname}.jpg 
+            mv ${picname}.jpg $output_dir
+            echo $picname has been converted
+            
+            convert $basen -thumbnail 200x200 ${picname}_thumb.jpg
+            mv ${picname}_thumb.jpg $output_dir/thumbs
+            echo $picname thumbnail has been created
+            
+            
+            set mydate = `date`
+           
+            cd $output_dir
+            echo "<a href="./$picname.jpg">" >> pic_name_xx.html
+            echo "<img src="./thumbs/${picname}_thumb.jpg"/></a>" >> pic_name_xx.html
+            echo "<p>$mydate[1] $mydate[2] $mydate[3] $mydate[6]</p>" >> pic_name_xx.html
+         
+            
+            shift
+    end
+    cd $output_dir
+    echo  "</body></html>" >> pic_name_xx.html
+    
+    echo Script is finished
+endif
+
+
+
+
